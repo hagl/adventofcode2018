@@ -22,12 +22,8 @@ processFile inputFile = do
   putStrLn (show (calculateFrequency input))
   putStrLn (show (findDuplicateFrequencyFromText input))
 
-main = mainWith myFunction
-  where 
-    myFunction = id;
-
-    mainWith function = do
-      args <- getArgs
-      case args of 
-        [input] -> processFile input 
-        _ -> putStrLn "error: specify input file"
+main =  do
+  args <- getArgs
+  case args of 
+    [input] -> processFile input 
+    _ -> putStrLn "error: specify input file"
