@@ -43,7 +43,8 @@ processFile inputFile = do
   input <- readFile inputFile
   case parse p_areas inputFile input of
     -- Right(areas) -> putStrLn (show (countOverlap areas))
-    Right(areas) -> putStrLn (show (findOverlapFree areas))
+    -- Right(areas) -> putStrLn (show (findOverlapFree areas))
+    Right(areas) -> putStrLn (show (filter (overlaps2 (areas !! 106 )) areas))
     Left(error) -> putStrLn (show error)
 
 main = do
@@ -63,6 +64,13 @@ isOverlap areas (x0, y0) = loop False areas where
   loop True (a:as) = if (contains a x0 y0) then True else loop True as
   loop False (a:as) = loop (contains a x0 y0) as
 
+overlaps2 a1 a2 = (x a1) < (x a2) + (w a2) && (x a2) < (x a1) + (w a1) && (y a1) < (y a2) + (h a2) && (y a2) < (y a1) + (h a1) 
+
+
+-- doesn't work on this constellation:
+--  .  a  . 
+--  b a/b b
+--  .  a  .
 overlaps area1 area2 =
     area1 `hasPointContainedIn` area2 
     || area2 `hasPointContainedIn` area1
@@ -76,9 +84,14 @@ overlaps area1 area2 =
       
  
 countOverlap areas = length (filter (isOverlap areas) [(x,y) | x <- [0..1000], y <- [0..1000]])
--- countOverlap areas = length (filter (isOverlap areas) [(x,y) | x <- [0..1000], y <- [0..1000]])
 
-findOverlapFree :: [Area] -> Maybe Area
-findOverlapFree areas = helper [] areas where
-  helper _ [] = Nothing
-  helper pre (a:as) = if (null (filter (overlaps a) (pre ++ as))) then Just(a) else helper (a:pre) as
+-- findOverlapFree :: [Area] -> Maybe Area
+-- findOverlapFree areas = helper [] areas where
+--   helper _ [] = Nothing
+--   helper pre (a:as) = if (null (filter (overlaps a) (pre ++ as))) then Just(a) else helper (a:pre) as
+
+  -- 
+findOverlapFree :: [Area] -> [Area]
+findOverlapFree areas = helper [] areas [] where
+  helper _ [] acc = acc
+  helper pre (a:as) acc = if (null (filter (overlaps2 a) (pre ++ as))) then helper (a:pre) as (a:acc) else helper (a:pre) as acc
