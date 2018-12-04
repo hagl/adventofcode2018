@@ -75,14 +75,32 @@ processFile inputFile = do
     Right(events) -> process (sortBy (\e1 -> \e2 -> compare (time e1) (time e2)) events)
     Left(error) -> putStrLn (show error)
 
+combineDays :: [(Integer,[Integer])] -> (Integer, [Integer])
+combineDays list = (fst (head list), list >>= \x -> (snd x))
+
+
+
 process sortedEvents = do
-  putStrLn (unlines (map show (sortedEvents)))
+  -- putStrLn (unlines (map show (sortedEvents)))
   let processedEvents = processEvents sortedEvents
-  putStrLn (unlines (map show processedEvents))
+  -- putStrLn (unlines (map show processedEvents))
   let grouped = groupBy (\e1 -> \e2 -> (fst e1) == (fst e2)) (sortBy  (\e1 -> \e2 -> compare (fst e1) (fst e2)) processedEvents)
-  putStrLn (unlines (map show (grouped)))
+  let flattened = fmap combineDays grouped
+  putStrLn (unlines (map show flattened))
+  let counted = sortBy (\e1 -> \e2 -> compare (snd e1) (snd e2)) (fmap (\p -> (fst p, length (snd p))) flattened)
+  putStrLn (unlines (map show (counted)))
+  let x = sortBy (\e1 -> \e2 -> compare (snd e1) (snd e2)) (fmap (\p -> (fst p, mostCommon (snd p))) flattened)
+  putStrLn (unlines (map show (x)))
+
+
+mostCommon :: [Integer] -> Integer
+mostCommont [] = 0
+mostCommon list = fst (last (sortBy  (\e1 -> \e2 -> compare (snd e1) (snd e2))  (map (\l -> (head l, length l)) (groupBy (==) (sort list)))))
+
+  -- x = [12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,53,54,55,56,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,51,52,53,54,55,42,43,44,45,30,31,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,53,54,55,56,57,58,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,34,35,36,37,43,44,45,46,47,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,51,52,53,54,55,56,57,58,59,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,11,12,13,14,57,58,59,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]
+  -- y = sortBy  (\e1 -> \e2 -> compare (snd e1) (snd e2))  (map (\l -> (head l, length l)) (groupBy (==) (sort x)))
   
-    
+
 test = do
   processFile "input.txt"
   
